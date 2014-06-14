@@ -169,5 +169,46 @@ median(perday.up.df$sum)
 ## [1] 10762
 ```
     
+By filling in the missing values, data set characterstics have changed markedly.  First, both the mean and the median have moved higher, with the mean being affected more drastically upwards.  Additionally, the historgram looks more normally distributed after we filled in the missing values in the data set. 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+Below we have created a new variable ("week") indicating whether the date is a weekend or weekday.
+
+
+```r
+require(chron)
+```
+
+```r
+move.up.df$week<-is.weekend(move.up.df$date)
+move.up.df[which(move.up.df$week==TRUE),"week"]<-"weekend"
+move.up.df[which(move.up.df$week==FALSE),"week"]<-"weekday"
+head(move.up.df,4)
+```
+
+```
+##     step       date interval    week
+## 1      2 2012-10-01        0 weekday
+## 62     0 2012-10-01        5 weekday
+## 123    0 2012-10-01       10 weekday
+## 184    0 2012-10-01       15 weekday
+```
+
+Below we compute and plot time series of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+
+
+```r
+require(ggplot2)
+```
+
+```r
+stepPerIntervalWeek.df<-ddply(move.up.df,.(interval,week),summarise,avg.steps=mean(step,na.rm=T))
+
+
+qplot(interval,avg.steps,facets = week~. ,
+      data=stepPerIntervalWeek.df,geom="line")
+```
+
+![plot of chunk unnamed-chunk-16](figure/unnamed-chunk-16.png) 
+
+
